@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ramanamarshi Elementary School</title>
+<style>
+:root{
+  --bg:#f2efe9; --panel:#faf8f4; --text:#33302b; --muted:#7a756c;
+  --primary:#7a7265; --green:#5a7052; --red:#a2554a; --yellow:#b08d4f;
+  --border:#ddd6c9;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:17px; line-height:1.5;
+}
+header{
+  background:var(--primary); color:#fff; text-align:center;
+  padding:calc(1.1rem + env(safe-area-inset-top,0px)) 1rem 1.1rem;
+}
+header h1{margin:0; font-size:1.4rem;}
+header p{margin:.25rem 0 0; font-size:.9rem; opacity:.9;}
+nav{
+  display:flex; overflow-x:auto; gap:.5rem; padding:.75rem;
+  background:var(--panel); border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:5;
+}
+nav button{
+  flex:0 0 auto; padding:.7rem 1.1rem; border-radius:10px; border:2px solid var(--border);
+  background:#fff; color:var(--text); font-size:1rem; font-weight:700; cursor:pointer;
+}
+nav button.active{background:var(--primary); border-color:var(--primary); color:#fff;}
+main{max-width:760px; margin:0 auto; padding:1.25rem 1rem 3rem;}
+.panel{display:none;}
+.panel.active{display:block;}
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:14px;
+  padding:1.25rem; margin-bottom:1rem;
+}
+.card h2{margin:0 0 .9rem; font-size:1.15rem;}
+label{display:block; font-weight:700; margin:.6rem 0 .3rem; font-size:.95rem;}
+input,select{
+  width:100%; padding:.7rem; border-radius:10px; border:2px solid var(--border);
+  font-size:1rem; background:#fff; color:var(--text);
+}
+button.action{
+  margin-top:1rem; width:100%; padding:.85rem; border-radius:10px; border:none;
+  background:var(--primary); color:#fff; font-size:1.05rem; font-weight:700; cursor:pointer;
+}
+button.action.green{background:var(--green);}
+.rowlist{display:flex; flex-direction:column; gap:.6rem; margin-top:.8rem;}
+.srow{
+  display:flex; align-items:center; justify-content:space-between; gap:.6rem;
+  border:2px solid var(--border); border-radius:10px; padding:.65rem .8rem;
+  background:#fbfdff;
+}
+.sname{font-weight:700; font-size:1rem;}
+.togglegrp{display:flex; gap:.4rem;}
+.togglegrp button{
+  padding:.5rem .9rem; border-radius:8px; border:2px solid var(--border);
+  background:#fff; font-weight:700; font-size:.9rem; cursor:pointer;
+}
+.togglegrp button.present.on{background:var(--green); border-color:var(--green); color:#fff;}
+.togglegrp button.absent.on{background:var(--red); border-color:var(--red); color:#fff;}
+.marksinput{width:80px; text-align:center;}
+table{width:100%; border-collapse:collapse; margin-top:.5rem;}
+th,td{padding:.6rem .5rem; text-align:left; border-bottom:1px solid var(--border); font-size:.92rem;}
+th{color:var(--muted); font-size:.8rem; text-transform:uppercase;}
+.badge{padding:.15rem .55rem; border-radius:20px; font-size:.78rem; font-weight:700;}
+.badge.good{background:#dcfce7; color:#166534;}
+.badge.warn{background:#fef9c3; color:#854d0e;}
+.badge.bad{background:#fee2e2; color:#991b1b;}
+.studentcard{cursor:pointer;}
+.big{font-size:1.6rem; font-weight:800;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:.8rem;}
+.stat{background:#ece7dc; border-radius:10px; padding:.9rem; text-align:center;}
+.stat .num{font-size:1.5rem; font-weight:800; color:var(--primary);}
+.stat .lbl{font-size:.8rem; color:var(--muted);}
+.empty{color:var(--muted); text-align:center; padding:1rem 0;}
+.backbtn{background:none;border:none;color:var(--primary);font-weight:700;font-size:1rem;cursor:pointer;margin-bottom:.6rem;padding:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏫 Ramanamarshi Elementary School</h1>
+  <p>Attendance · Marks · Student Records</p>
+</header>
+
+<nav>
+  <button data-tab="home" class="active">🏠 Home</button>
+  <button data-tab="attendance">✅ Attendance</button>
+  <button data-tab="marks">📝 Marks</button>
+  <button data-tab="records">📋 Records</button>
+</nav>
+
+<main>
+
+  <div class="panel active" id="home">
+    <div class="card">
+      <h2>Add a Student</h2>
+      <label>Student Name</label>
+      <input id="newName" placeholder="e.g. Aarav Sharma">
+      <label>Class</label>
+      <select id="newClass">
+        <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+        <option>Class 4</option><option selected>Class 5</option><option>Class 6</option>
+        <option>Class 7</option><option>Class 8</option>
+      </select>
+      <button class="action" onclick="addStudent()">➕ Add Student</button>
+    </div>
+    <div class="card">
+      <h2>Overview</h2>
+      <div class="grid2">
+        <div class="stat"><div class="num" id="statCount">0</div><div class="lbl">Total Students</div></div>
+        <div class="stat"><div class="num" id="statToday">0%</div><div class="lbl">Present Today</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="attendance">
+    <div class="card">
+      <h2>Mark Attendance</h2>
+      <label>Date</label>
+      <input type="date" id="attDate">
+      <div class="rowlist" id="attList"></div>
+      <button class="action green" onclick="saveAttendance()">💾 Save Attendance</button>
+    </div>
+  </div>
+
+  <div class="panel" id="marks">
+    <div class="card">
+      <h2>Enter Marks</h2>
+      <label>Subject</label>
+      <select id="subjectSel">
+        <option>Math</option><option>Science</option><option>English</option>
+        <option>Social Studies</option><option>Language</option>
+      </select>
+      <label>Max Marks</label>
+      <input type="number" id="maxMarks" value="100">
+      <div class="rowlist" id="marksList"></div>
+      <button class="action green" onclick="saveMarks()">💾 Save Marks</button>
+    </div>
+  </div>
+
+  <div class="panel" id="records">
+    <div class="card" id="recordsCard">
+      <h2>Student Records</h2>
+      <div id="recordsList"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let data = { students: [], attendance: {}, marks: {} };
+
+function load(){
+  try{
+    const raw = localStorage.getItem('schoolDashboardData');
+    if(raw) data = JSON.parse(raw);
+  }catch(e){}
+}
+function save(){
+  try{ localStorage.setItem('schoolDashboardData', JSON.stringify(data)); }catch(e){}
+}
+
+function switchTab(tab){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===tab));
+  if(tab==='attendance') renderAttendance();
+  if(tab==='marks') renderMarks();
+  if(tab==='records') renderRecords();
+  if(tab==='home') renderHome();
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+function addStudent(){
+  const name = document.getElementById('newName').value.trim();
+  const cls = document.getElementById('newClass').value;
+  if(!name){ alert('Please enter a student name'); return; }
+  data.students.push({ id: Date.now().toString(), name, cls });
+  document.getElementById('newName').value = '';
+  save();
+  renderHome();
+}
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+function renderHome(){
+  document.getElementById('statCount').textContent = data.students.length;
+  const today = todayStr();
+  const todayAtt = data.attendance[today] || {};
+  const total = data.students.length;
+  const presentCount = Object.values(todayAtt).filter(v=>v==='P').length;
+  document.getElementById('statToday').textContent = total ? Math.round(presentCount/total*100)+'%' : '0%';
+}
+
+function renderAttendance(){
+  const dateEl = document.getElementById('attDate');
+  if(!dateEl.value) dateEl.value = todayStr();
+  dateEl.onchange = renderAttendance;
+  const date = dateEl.value;
+  const rec = data.attendance[date] || {};
+  const list = document.getElementById('attList');
+  if(data.students.length===0){ list.innerHTML = '<p class="empty">No students yet. Add one on the Home tab.</p>'; return; }
+  list.innerHTML = data.students.map(s=>`
+    <div class="srow">
+      <span class="sname">${escapeHtml(s.name)} <small style="color:var(--muted)">(${s.cls})</small></span>
+      <div class="togglegrp" data-id="${s.id}">
+        <button type="button" class="present ${rec[s.id]==='P'?'on':''}" onclick="setAtt('${s.id}','P')">Present</button>
+        <button type="button" class="absent ${rec[s.id]==='A'?'on':''}" onclick="setAtt('${s.id}','A')">Absent</button>
+      </div>
+    </div>`).join('');
+}
+let pendingAtt = {};
+function setAtt(id, status){
+  pendingAtt[id] = status;
+  const grp = document.querySelector(`.togglegrp[data-id="${id}"]`);
+  grp.querySelector('.present').classList.toggle('on', status==='P');
+  grp.querySelector('.absent').classList.toggle('on', status==='A');
+}
+function saveAttendance(){
+  const date = document.getElementById('attDate').value || todayStr();
+  data.attendance[date] = Object.assign({}, data.attendance[date]||{}, pendingAtt);
+  pendingAtt = {};
+  save();
+  alert('Attendance saved for '+date);
+  renderHome();
+}
+
+function renderMarks(){
+  const list = document.getElementById('marksList');
+  if(data.students.length===0){ list.innerHTML = '<p class="empty">No students yet. Add one on the Home tab.</p>'; return; }
+  const subject = document.getElementById('subjectSel').value;
+  document.getElementById('subjectSel').onchange = renderMarks;
+  list.innerHTML = data.students.map(s=>{
+    const existing = (data.marks[s.id] && data.marks[s.id][subject]) || '';
+    return `<div class="srow">
+      <span class="sname">${escapeHtml(s.name)}</span>
+      <input type="number" class="marksinput" data-id="${s.id}" value="${existing}" placeholder="marks">
+    </div>`;
+  }).join('');
+}
+function saveMarks(){
+  const subject = document.getElementById('subjectSel').value;
+  const max = document.getElementById('maxMarks').value || 100;
+  document.querySelectorAll('#marksList input').forEach(inp=>{
+    const id = inp.dataset.id;
+    const val = inp.value;
+    if(val===''){ return; }
+    if(!data.marks[id]) data.marks[id] = {};
+    data.marks[id][subject] = { score: Number(val), max: Number(max) };
+  });
+  save();
+  alert('Marks saved for '+subject);
+}
+
+function renderRecords(){
+  const list = document.getElementById('recordsList');
+  const card = document.getElementById('recordsCard');
+  if(data.students.length===0){ list.innerHTML = '<p class="empty">No students yet. Add one on the Home tab.</p>'; return; }
+  list.innerHTML = data.students.map(s=>{
+    const attDates = Object.keys(data.attendance);
+    let present=0, totalDays=0;
+    attDates.forEach(d=>{ if(data.attendance[d][s.id]){ totalDays++; if(data.attendance[d][s.id]==='P') present++; } });
+    const pct = totalDays ? Math.round(present/totalDays*100) : null;
+    let badgeClass = 'warn', badgeText = 'No data';
+    if(pct!==null){
+      badgeText = pct+'% attendance';
+      badgeClass = pct>=90?'good':(pct>=75?'warn':'bad');
+    }
+    return `<div class="card studentcard" onclick="openStudent('${s.id}')" style="margin-bottom:.7rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div class="sname">${escapeHtml(s.name)}</div><small style="color:var(--muted)">${s.cls}</small></div>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openStudent(id){
+  const s = data.students.find(x=>x.id===id);
+  if(!s) return;
+  const card = document.getElementById('recordsCard');
+  const attDates = Object.keys(data.attendance).sort();
+  let present=0, totalDays=0;
+  let attRows = '';
+  attDates.forEach(d=>{
+    const status = data.attendance[d][id];
+    if(status){
+      totalDays++; if(status==='P') present++;
+      attRows += `<tr><td>${d}</td><td>${status==='P'?'✅ Present':'❌ Absent'}</td></tr>`;
+    }
+  });
+  const pct = totalDays ? Math.round(present/totalDays*100) : 0;
+  let marksRows = '';
+  const m = data.marks[id] || {};
+  Object.keys(m).forEach(subj=>{
+    const mk = m[subj];
+    marksRows += `<tr><td>${subj}</td><td>${mk.score} / ${mk.max}</td></tr>`;
+  });
+  card.innerHTML = `
+    <button class="backbtn" onclick="renderRecords()">← Back to all students</button>
+    <h2>${escapeHtml(s.name)} <small style="color:var(--muted);font-weight:400;">(${s.cls})</small></h2>
+    <div class="grid2">
+      <div class="stat"><div class="num">${pct}%</div><div class="lbl">Attendance</div></div>
+      <div class="stat"><div class="num">${Object.keys(m).length}</div><div class="lbl">Subjects graded</div></div>
+    </div>
+    <h2 style="margin-top:1.2rem;">Marks</h2>
+    ${marksRows ? `<table><tr><th>Subject</th><th>Score</th></tr>${marksRows}</table>` : '<p class="empty">No marks entered yet.</p>'}
+    <h2 style="margin-top:1.2rem;">Attendance History</h2>
+    ${attRows ? `<table><tr><th>Date</th><th>Status</th></tr>${attRows}</table>` : '<p class="empty">No attendance recorded yet.</p>'}
+  `;
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
+}
+
+load();
+renderHome();
+</script>
+
+</body>
+</html>
